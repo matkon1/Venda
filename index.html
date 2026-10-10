@@ -94,4 +94,560 @@
 
     <!-- 2. NAHRÁT LÁTKU -->
     <section id="sec-upload" class="hidden space-y-4">
-      <div class="bg-slate-800 p-6 rounded
+      <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+        <div>
+          <h2 class="text-base font-bold text-white">Vytvořit novou výzvu ze sešitu</h2>
+          <p class="text-xs text-slate-400 mt-0.5">Vyfoť stránku (nebo více stran najednou) a AI z nich vytvoří výukovou hru.</p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Předmět:</label>
+          <select id="uploadSubject" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-amber-400">
+            <option value="Dějepis">Dějepis</option>
+            <option value="Fyzika">Fyzika</option>
+            <option value="Přírodopis">Přírodopis</option>
+            <option value="Zeměpis">Zeměpis</option>
+            <option value="Český jazyk">Český jazyk</option>
+            <option value="Matematika">Matematika</option>
+            <option value="Chemie">Chemie</option>
+            <option value="Anglický jazyk">Anglický jazyk</option>
+            <option value="Německý jazyk">Německý jazyk</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-slate-300 mb-1">Fotky stránky sešitu:</label>
+          <input id="uploadFile" type="file" accept="image/*" multiple class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600 cursor-pointer">
+        </div>
+
+        <button id="startAiBtn" onclick="processUpload()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-lg text-sm transition shadow flex items-center justify-center gap-2">
+          <span id="aiBtnText">Vygenerovat herní lekci 🚀</span>
+          <div id="aiSpinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
+        </button>
+
+        <p id="uploadStatus" class="text-xs text-center text-slate-400 hidden"></p>
+      </div>
+    </section>
+
+    <!-- 3. PRO MAMKU -->
+    <section id="sec-parent" class="hidden space-y-4">
+      <!-- PIN Formulář -->
+      <div id="pinBox" class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center space-y-3">
+        <span class="text-3xl">🔒</span>
+        <h2 class="text-base font-bold text-white">Přístup pro rodiče</h2>
+        <p class="text-xs text-slate-400">Zadej PIN pro zobrazení výsledků (výchozí: 1234)</p>
+        <div class="flex justify-center gap-2 max-w-xs mx-auto">
+          <input id="pinInput" type="password" maxlength="8" placeholder="••••" class="w-32 text-center tracking-widest bg-slate-950 border border-slate-700 rounded-lg py-2 text-sm text-white focus:border-amber-400 outline-none">
+          <button onclick="unlockParentDashboard()" class="px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">Odemknout</button>
+        </div>
+      </div>
+
+      <!-- Nástěnka po zadání PINu -->
+      <div id="parentDashboard" class="hidden space-y-4">
+        <div class="flex justify-between items-center bg-slate-800 p-3.5 rounded-xl border border-slate-700">
+          <span class="text-xs text-slate-300 font-medium">Správa zabezpečení:</span>
+          <button onclick="changeParentPin()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-slate-200 transition">🔑 Změnit PIN</button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+            <p class="text-xs text-slate-400">Celkem pokusů</p>
+            <p id="statTotalRuns" class="text-2xl font-black text-amber-400 mt-1">0</p>
+          </div>
+          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
+            <p class="text-xs text-slate-400">Průměrná úspěšnost</p>
+            <p id="statAvgScore" class="text-2xl font-black text-emerald-400 mt-1">0 %</p>
+          </div>
+        </div>
+
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">Historie procvičování</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="text-slate-400 border-b border-slate-700">
+                <tr>
+                  <th class="pb-2">Datum</th>
+                  <th class="pb-2">Předmět</th>
+                  <th class="pb-2">Lekce</th>
+                  <th class="pb-2 text-right">Výsledek</th>
+                </tr>
+              </thead>
+              <tbody id="attemptsTableBody" class="divide-y divide-slate-800 text-slate-300">
+                <tr><td colspan="4" class="py-4 text-center text-slate-500">Zatím žádné pokusy</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const GEMINI_API_KEY = "AIzaSyC59-_IOR7BYyKzUOAjZgnmSWx9jQT4X5w";
+    const SUPABASE_URL = "https://ozwysdwnrpzpnjimhqao.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_SkPEAfNlXWQ-UK8kZQgjSg_4JHkT0gA";
+
+    const DEFAULT_LESSON = {
+      id: "demo",
+      subject: "Dějepis",
+      title: "Doba bronzová a železná",
+      summary: "V době bronzové vzniká bronz (slitina mědi a cínu). Nástroje a zbraně se odlévají do kamenných forem. Jako platidlo slouží hřivny a rozvíjí se dálkový obchod. V době železné přichází silnější kov železo (cca 700 př. n. l.), staví se hradiště a v čele společnosti stojí náčelník s vojenskou družinou.",
+      flashcards: [
+        { term: "Bronz", definition: "Slitina mědi a cínu." },
+        { term: "Hřivna", definition: "Kovový kruh, platidlo v době bronzové." },
+        { term: "Řemesla v době železné", definition: "Rozvoj kovářství a kolářství." },
+        { term: "Sídla", definition: "Opevněná hradiště na vyvýšených místech a neopevněné vesnice." }
+      ],
+      quiz: [
+        {
+          question: "Z jakých dvou kovů se skládá slitina bronz?",
+          options: ["Měď a cín", "Železo a zinek", "Měď a zlato", "Olovo a stříbro"],
+          correctIndex: 0,
+          explanation: "Bronz je slitina mědi a cínu."
+        },
+        {
+          question: "Co byla v době bronzové hřivna?",
+          options: ["Kovový kruh používaný jako platidlo", "Zemědělský pluh na orání", "Opevněná vesnice náčelníka", "Forma na tavení mědi"],
+          correctIndex: 0,
+          explanation: "Hřivny fungovaly jako předchůdce mincí a platidlo."
+        },
+        {
+          question: "Kdo stál v době železné v čele společnosti?",
+          options: ["Náčelník se svou vojenskou družinou", "Všichni měli stejné postavení", "Pouze samotní kováři", "Kupci z ciziny"],
+          correctIndex: 0,
+          explanation: "Vládli vojenští náčelníci obklopení ozbrojenou družinou."
+        }
+      ]
+    };
+
+    let allLessons = [DEFAULT_LESSON];
+    let currentLesson = DEFAULT_LESSON;
+    let xp = parseInt(localStorage.getItem("SQ_XP") || "0");
+    let lives = 3;
+    let attempts = JSON.parse(localStorage.getItem("SQ_ATTEMPTS") || "[]");
+
+    // Zvuky
+    function beep(freq, type, dur) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.setValueAtTime(0.06, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start();
+        o.stop(ctx.currentTime + dur);
+      } catch(e) {}
+    }
+
+    function addXP(points) {
+      xp += points;
+      localStorage.setItem("SQ_XP", xp);
+      document.getElementById("xpDisplay").innerText = xp;
+      const lvl = Math.floor(xp / 100) + 1;
+      document.getElementById("playerLevel").innerText = `Level ${lvl} • ${lvl > 3 ? 'Zkušený badatel' : 'Začátečník'}`;
+    }
+
+    // PŘEPÍNÁNÍ ZÁLOŽEK
+    function switchTab(name) {
+      const tabs = ['game', 'upload', 'parent'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`sec-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (sec) sec.classList.toggle('hidden', t !== name);
+        if (btn) {
+          if (t === name) {
+            btn.className = "py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition";
+          } else {
+            btn.className = "py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+          }
+        }
+      });
+      if (name === 'parent') renderParentStats();
+    }
+
+    // KASKÁDOVÝ VÝBĚR: PŘEDMĚT -> LÁTKA
+    function filterLessonsBySubject() {
+      const selectedSub = document.getElementById("filterSubjectSelect").value;
+      const sel = document.getElementById("lessonSelect");
+      sel.innerHTML = "";
+
+      const filtered = selectedSub === "ALL" 
+        ? allLessons 
+        : allLessons.filter(l => l.subject === selectedSub);
+
+      if (filtered.length === 0) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.innerText = "Žádná nahraná látka";
+        sel.appendChild(opt);
+        return;
+      }
+
+      filtered.forEach(l => {
+        const opt = document.createElement("option");
+        opt.value = l.id;
+        opt.innerText = selectedSub === "ALL" ? `[${l.subject}] ${l.title}` : l.title;
+        if (currentLesson && String(currentLesson.id) === String(l.id)) opt.selected = true;
+        sel.appendChild(opt);
+      });
+
+      if (!filtered.some(l => currentLesson && String(currentLesson.id) === String(l.id))) {
+        renderLesson(filtered[0]);
+      }
+    }
+
+    function onSelectLessonChange() {
+      const id = document.getElementById("lessonSelect").value;
+      const found = allLessons.find(l => String(l.id) === String(id));
+      if (found) renderLesson(found);
+    }
+
+    // VYKRESLENÍ LEKCE
+    function renderLesson(lesson) {
+      currentLesson = lesson;
+      lives = 3;
+      document.getElementById("livesDisplay").innerText = "❤️❤️❤️";
+      document.getElementById("lessonTitle").innerText = lesson.title || "Lekce";
+      document.getElementById("lessonSummary").innerText = lesson.summary || "";
+      document.getElementById("gameSubjectBadge").innerText = lesson.subject || "Předmět";
+
+      // Kartičky
+      const box = document.getElementById("flashcardsBox");
+      box.innerHTML = "";
+      (lesson.flashcards || []).forEach(fc => {
+        const card = document.createElement("div");
+        card.className = "card-flip h-28 cursor-pointer select-none";
+        card.innerHTML = `
+          <div class="card-inner relative w-full h-full text-center rounded-xl p-3 flex items-center justify-center bg-slate-950 border border-slate-700">
+            <div class="card-front absolute font-bold text-amber-300 px-2 text-sm">${fc.term}</div>
+            <div class="card-back absolute text-xs text-slate-300 px-3 leading-snug">${fc.definition}</div>
+          </div>
+        `;
+        card.onclick = () => {
+          card.querySelector(".card-inner").classList.toggle("card-flipped");
+          beep(440, 'sine', 0.05);
+          addXP(1);
+        };
+        box.appendChild(card);
+      });
+
+      renderQuiz(lesson.quiz || []);
+    }
+
+    // KVÍZ
+    function renderQuiz(questions) {
+      const qBox = document.getElementById("quizBox");
+      qBox.innerHTML = "";
+      let qIdx = 0;
+      let correctCount = 0;
+
+      if (!questions || questions.length === 0) {
+        qBox.innerHTML = `<p class="text-xs text-slate-400">Pro tuto látku nejsou žádné otázky.</p>`;
+        document.getElementById("quizCounter").innerText = "";
+        return;
+      }
+
+      function showQ() {
+        if (qIdx >= questions.length) {
+          const pct = Math.round((correctCount / questions.length) * 100);
+          qBox.innerHTML = `
+            <div class="p-5 text-center bg-slate-950 rounded-xl space-y-2 border border-slate-700">
+              <p class="text-lg font-bold text-emerald-400">Skvělá práce! Lekce hotová 🎉</p>
+              <p class="text-xs text-slate-300">Úspěšnost: <b class="text-white">${pct} %</b> (${correctCount} z ${questions.length})</p>
+            </div>
+          `;
+          saveAttempt(currentLesson.subject, currentLesson.title, pct);
+          return;
+        }
+
+        const q = questions[qIdx];
+        document.getElementById("quizCounter").innerText = `Otázka ${qIdx + 1} / ${questions.length}`;
+
+        const opts = (q.options || []).map((t, i) => ({ t, isRight: i === q.correctIndex })).sort(() => Math.random() - 0.5);
+
+        qBox.innerHTML = `
+          <p class="font-bold text-sm text-slate-100">${q.question}</p>
+          <div id="optsDiv" class="grid grid-cols-1 gap-2 pt-1"></div>
+          <div id="qExpl" class="hidden text-xs p-3 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 leading-relaxed"></div>
+          <button id="qNextBtn" class="hidden w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">Další otázka →</button>
+        `;
+
+        const optsDiv = document.getElementById("optsDiv");
+        const expDiv = document.getElementById("qExpl");
+        const nextBtn = document.getElementById("qNextBtn");
+
+        opts.forEach(o => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "text-left p-3 rounded-xl border border-slate-700 bg-slate-950 hover:border-slate-500 text-xs text-slate-200 transition font-medium";
+          btn.innerText = o.t;
+
+          btn.onclick = () => {
+            Array.from(optsDiv.children).forEach(b => b.disabled = true);
+            if (o.isRight) {
+              btn.classList.add("!border-emerald-500", "!bg-emerald-950/60", "!text-emerald-200");
+              beep(587, 'triangle', 0.1);
+              addXP(10);
+              correctCount++;
+            } else {
+              btn.classList.add("!border-rose-500", "!bg-rose-950/60", "!text-rose-200");
+              beep(180, 'sawtooth', 0.2);
+              lives = Math.max(0, lives - 1);
+              document.getElementById("livesDisplay").innerText = "❤️❤️❤️".slice(0, lives * 2) + "🖤".repeat(3 - lives);
+            }
+            expDiv.innerText = q.explanation || (o.isRight ? "Správně!" : "Špatně.");
+            expDiv.classList.remove("hidden");
+            nextBtn.classList.remove("hidden");
+          };
+          optsDiv.appendChild(btn);
+        });
+
+        nextBtn.onclick = () => {
+          qIdx++;
+          showQ();
+        };
+      }
+
+      showQ();
+    }
+
+    // ULOŽENÍ VÝSLEDKŮ
+    async function saveAttempt(subject, title, percentage) {
+      const entry = {
+        date: new Date().toLocaleDateString('cs-CZ'),
+        subject,
+        title,
+        percentage
+      };
+      attempts.unshift(entry);
+      localStorage.setItem("SQ_ATTEMPTS", JSON.stringify(attempts));
+
+      // Supabase zápis
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/attempts`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ subject, score: percentage, max_score: 100, percentage })
+        });
+      } catch(e) {}
+    }
+
+    // NAČTENÍ LEKCÍ ZE SUPABASE
+    async function loadLessons() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*&order=created_at.desc`, {
+          headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) {
+            allLessons = [DEFAULT_LESSON, ...data.map(d => ({
+              id: d.id,
+              subject: d.subject,
+              title: d.title,
+              summary: d.summary,
+              flashcards: d.payload?.flashcards || [],
+              quiz: d.payload?.quiz || []
+            }))];
+            filterLessonsBySubject();
+          }
+        }
+      } catch(e) {}
+    }
+
+    // PŘÍPRAVA FOTKY
+    function readFileAsBase64(file) {
+      return new Promise((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(r.result.split(',')[1]);
+        r.onerror = rej;
+        r.readAsDataURL(file);
+      });
+    }
+
+    // NAHRÁVÁNÍ A AI GENEROVÁNÍ
+    async function processUpload() {
+      const fileInput = document.getElementById("uploadFile");
+      const subject = document.getElementById("uploadSubject").value;
+      const status = document.getElementById("uploadStatus");
+      const spinner = document.getElementById("aiSpinner");
+      const btnText = document.getElementById("aiBtnText");
+
+      if (!fileInput.files || fileInput.files.length === 0) {
+        alert("Nejprve vyber nebo vyfoť alespoň jednu stránku sešitu!");
+        return;
+      }
+
+      spinner.classList.remove("hidden");
+      btnText.innerText = "Čtu fotky...";
+      status.classList.remove("hidden");
+      status.innerText = "Odesílám do AI...";
+
+      try {
+        const files = Array.from(fileInput.files);
+        const imageParts = [];
+        for (const file of files) {
+          const b64 = await readFileAsBase64(file);
+          imageParts.push({
+            inline_data: { mime_type: "image/jpeg", data: b64 }
+          });
+        }
+
+        const prompt = `Jsi učitel pro žáka ZŠ (12 let). Z fotek sešitu z předmětu ${subject} vytvoř výukový balíček v češtině. 
+Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
+{
+  "title": "Název tématu",
+  "summary": "Stručný a srozumitelný souhrn látky (2-3 odstavce)",
+  "flashcards": [
+    { "term": "Pojem", "definition": "Vysvětlení" }
+  ],
+  "quiz": [
+    {
+      "question": "Otázka?",
+      "options": ["Správná možnost", "Špatná 1", "Špatná 2", "Špatná 3"],
+      "correctIndex": 0,
+      "explanation": "Stručné vysvětlení"
+    }
+  ]
+}`;
+
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{ text: prompt }, ...imageParts]
+            }],
+            generationConfig: { responseMimeType: "application/json" }
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error?.message || `Chyba API ${res.status}`);
+        }
+
+        const jsonRes = await res.json();
+        const generated = JSON.parse(jsonRes.candidates[0].content.parts[0].text);
+
+        const newLesson = {
+          id: "local_" + Date.now(),
+          subject: subject,
+          title: generated.title,
+          summary: generated.summary,
+          flashcards: generated.flashcards,
+          quiz: generated.quiz
+        };
+
+        // Zápis do Supabase
+        try {
+          await fetch(`${SUPABASE_URL}/rest/v1/lessons`, {
+            method: "POST",
+            headers: {
+              "apikey": SUPABASE_KEY,
+              "Authorization": `Bearer ${SUPABASE_KEY}`,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              subject: subject,
+              title: newLesson.title,
+              summary: newLesson.summary,
+              payload: { flashcards: newLesson.flashcards, quiz: newLesson.quiz }
+            })
+          });
+        } catch(e) {}
+
+        allLessons.unshift(newLesson);
+        document.getElementById("filterSubjectSelect").value = subject;
+        filterLessonsBySubject();
+        renderLesson(newLesson);
+
+        fileInput.value = "";
+        alert("Výuková hra byla úspěšně vytvořena!");
+        switchTab('game');
+      } catch (err) {
+        alert("Nastala chyba: " + err.message);
+        status.innerText = "Chyba při zpracování.";
+      } finally {
+        spinner.classList.add("hidden");
+        btnText.innerText = "Vygenerovat herní lekci 🚀";
+      }
+    }
+
+    // RODIČOVSKÝ PŘÍSTUP
+    function getPin() {
+      return localStorage.getItem("SQ_PIN") || "1234";
+    }
+
+    function unlockParentDashboard() {
+      const entered = document.getElementById("pinInput").value.trim();
+      if (entered === getPin()) {
+        document.getElementById("pinBox").classList.add("hidden");
+        document.getElementById("parentDashboard").classList.remove("hidden");
+        renderParentStats();
+      } else {
+        alert("Nesprávný PIN!");
+      }
+    }
+
+    document.getElementById("pinInput").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") unlockParentDashboard();
+    });
+
+    function changeParentPin() {
+      const oldPin = prompt("Zadej stávající PIN:");
+      if (oldPin !== getPin()) return alert("Původní PIN nesouhlasí!");
+      const newPin = prompt("Zadej nový PIN (minimálně 4 znaky):");
+      if (newPin && newPin.trim().length >= 4) {
+        localStorage.setItem("SQ_PIN", newPin.trim());
+        alert("PIN byl v pořádku změněn!");
+      } else if (newPin !== null) {
+        alert("PIN musí mít alespoň 4 znaky!");
+      }
+    }
+
+    function renderParentStats() {
+      const tbody = document.getElementById("attemptsTableBody");
+      tbody.innerHTML = "";
+
+      if (attempts.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Zatím žádné pokusy</td></tr>`;
+        document.getElementById("statTotalRuns").innerText = "0";
+        document.getElementById("statAvgScore").innerText = "0 %";
+        return;
+      }
+
+      document.getElementById("statTotalRuns").innerText = attempts.length;
+      const avg = Math.round(attempts.reduce((a, b) => a + b.percentage, 0) / attempts.length);
+      document.getElementById("statAvgScore").innerText = `${avg} %`;
+
+      attempts.forEach(a => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-800/50";
+        tr.innerHTML = `
+          <td class="py-2.5 text-slate-400">${a.date}</td>
+          <td class="py-2.5 font-semibold text-slate-200">${a.subject}</td>
+          <td class="py-2.5 text-slate-300">${a.title}</td>
+          <td class="py-2.5 text-right font-bold ${a.percentage >= 70 ? 'text-emerald-400' : 'text-amber-400'}">${a.percentage} %</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Start
+    addXP(0);
+    filterLessonsBySubject();
+    renderLesson(DEFAULT_LESSON);
+    loadLessons();
+  </script>
+</body>
+</html>
