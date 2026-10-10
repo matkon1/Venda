@@ -3,48 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Školní Výzva</title>
+  <title>Školní Výzva 🚀</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     .card-flip { perspective: 1000px; }
-    .card-inner { transition: transform 0.4s; transform-style: preserve-3d; }
+    .card-inner { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
     .card-flipped { transform: rotateY(180deg); }
     .card-front, .card-back { backface-visibility: hidden; }
     .card-back { transform: rotateY(180deg); }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
-  <div class="max-w-2xl mx-auto space-y-4">
+<body class="bg-gradient-to-br from-indigo-950 via-slate-900 to-sky-950 text-slate-100 min-h-screen p-3 md:p-6 font-sans">
+  <div class="max-w-3xl mx-auto space-y-4">
 
-    <!-- Horní lišta s XP -->
-    <header class="bg-slate-800 p-4 rounded-2xl border border-slate-700 flex justify-between items-center shadow-lg">
+    <!-- Horní lišta s XP, levelem a nastavením -->
+    <header class="bg-white/10 backdrop-blur-md p-4 rounded-3xl border border-white/15 flex justify-between items-center shadow-xl">
       <div class="flex items-center gap-3">
-        <span class="text-2xl">⚡</span>
+        <span class="text-3xl filter drop-shadow">⚡</span>
         <div>
-          <h1 class="text-base font-bold text-amber-400 leading-tight">Školní Výzva</h1>
-          <p id="playerLevel" class="text-xs text-slate-400">Level 1 • Začátečník</p>
+          <h1 class="text-lg font-black bg-gradient-to-r from-amber-300 via-orange-300 to-yellow-200 bg-clip-text text-transparent">Školní Výzva</h1>
+          <p id="playerLevel" class="text-xs font-semibold text-indigo-200">Level 1 • Začátečník</p>
         </div>
       </div>
-      <div class="bg-slate-950 px-3 py-1 rounded-xl border border-slate-700 flex items-center gap-1.5">
-        <span class="text-xs text-amber-400 font-black">XP</span>
-        <span id="xpDisplay" class="text-sm font-bold text-white">0</span>
+      <div class="flex items-center gap-2">
+        <div class="bg-slate-900/80 px-3.5 py-1.5 rounded-2xl border border-amber-400/30 flex items-center gap-2 shadow-inner">
+          <span class="text-xs font-black text-amber-400">XP</span>
+          <span id="xpDisplay" class="text-base font-black text-white">0</span>
+        </div>
+        <button onclick="promptNewApiKey()" class="p-2 bg-white/10 hover:bg-white/20 rounded-2xl text-xs transition border border-white/10" title="Změnit API klíč">🔑</button>
       </div>
     </header>
 
-    <!-- Navigační záložky -->
-    <nav class="grid grid-cols-3 gap-2 bg-slate-950 p-1.5 rounded-xl border border-slate-800 text-xs font-semibold">
-      <button id="tabBtn-game" onclick="switchTab('game')" class="py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition">🎮 Herní zóna</button>
-      <button id="tabBtn-upload" onclick="switchTab('upload')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition">📸 Nahrát látku</button>
-      <button id="tabBtn-parent" onclick="switchTab('parent')" class="py-2.5 rounded-lg text-slate-400 hover:text-white transition">👩‍👦 Pro mamku</button>
+    <!-- Navigace mezi herními záložkami -->
+    <nav class="grid grid-cols-3 gap-2 bg-slate-900/70 backdrop-blur p-1.5 rounded-2xl border border-white/10 text-xs font-bold">
+      <button id="tabBtn-game" onclick="switchTab('game')" class="py-2.5 rounded-xl bg-amber-400 text-slate-950 shadow-lg font-black transition">🎮 Trénink</button>
+      <button id="tabBtn-upload" onclick="switchTab('upload')" class="py-2.5 rounded-xl text-slate-300 hover:text-white transition">📸 Nová látka</button>
+      <button id="tabBtn-parent" onclick="switchTab('parent')" class="py-2.5 rounded-xl text-slate-300 hover:text-white transition">👩‍👦 Pro mamku</button>
     </nav>
 
     <!-- 1. HERNÍ ZÓNA -->
     <section id="sec-game" class="space-y-4">
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+      
+      <!-- Kaskádový výběr -->
+      <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 space-y-3 shadow-lg">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">1. Předmět:</label>
-            <select id="filterSubjectSelect" onchange="filterLessonsBySubject()" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-200 outline-none w-full focus:border-amber-400">
+            <label class="block text-[11px] font-bold text-indigo-200 uppercase tracking-wider mb-1">1. Předmět</label>
+            <select id="filterSubjectSelect" onchange="filterLessonsBySubject()" class="bg-slate-900/90 border border-indigo-400/30 text-xs rounded-xl px-3 py-2.5 text-slate-100 outline-none w-full focus:border-amber-400 font-medium">
               <option value="ALL">Všechny předměty</option>
               <option value="Dějepis">Dějepis</option>
               <option value="Fyzika">Fyzika</option>
@@ -58,51 +64,81 @@
             </select>
           </div>
           <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">2. Téma / Látka:</label>
-            <select id="lessonSelect" onchange="onSelectLessonChange()" class="bg-slate-950 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-200 outline-none w-full focus:border-amber-400">
-            </select>
+            <label class="block text-[11px] font-bold text-indigo-200 uppercase tracking-wider mb-1">2. Téma k procvičení</label>
+            <select id="lessonSelect" onchange="onSelectLessonChange()" class="bg-slate-900/90 border border-indigo-400/30 text-xs rounded-xl px-3 py-2.5 text-slate-100 outline-none w-full focus:border-amber-400 font-medium"></select>
           </div>
         </div>
       </div>
 
-      <div class="bg-slate-800/90 backdrop-blur p-3 rounded-xl border border-slate-700 flex justify-between items-center">
-        <div class="flex items-center gap-1.5">
-          <span class="text-xs text-slate-400">Životy:</span>
-          <span id="livesDisplay" class="text-sm tracking-wider">❤️❤️❤️</span>
+      <!-- Životy a předmětový štítek -->
+      <div class="bg-slate-900/80 backdrop-blur p-3.5 rounded-2xl border border-white/10 flex justify-between items-center shadow">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-400">Životy:</span>
+          <span id="livesDisplay" class="text-base tracking-widest">❤️❤️❤️</span>
         </div>
-        <div id="gameSubjectBadge" class="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Dějepis</div>
+        <div id="gameSubjectBadge" class="text-xs font-black px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 shadow-sm">Dějepis</div>
       </div>
 
-      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-2">
-        <h2 id="lessonTitle" class="text-lg font-bold text-amber-400">Doba bronzová a železná</h2>
-        <p id="lessonSummary" class="text-xs md:text-sm text-slate-300 leading-relaxed"></p>
+      <!-- Souhrn látky -->
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/15 space-y-3 shadow-xl">
+        <h2 id="lessonTitle" class="text-xl font-black text-amber-300">Doba bronzová a železná</h2>
+        <div id="timelineContainer" class="hidden py-2 space-y-2"></div>
+        <p id="lessonSummary" class="text-xs md:text-sm text-slate-200 leading-relaxed font-normal"></p>
       </div>
 
-      <div class="space-y-2">
-        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Klíčové pojmy (klikni pro otočení)</h3>
-        <div id="flashcardsBox" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
-      </div>
-
-      <div class="bg-slate-800 p-5 rounded-xl border border-slate-700 space-y-3">
+      <!-- Třídicí minihra -->
+      <div id="sortingGameContainer" class="bg-white/10 backdrop-blur-md p-5 rounded-3xl border border-white/15 space-y-4 shadow-xl">
         <div class="flex justify-between items-center">
-          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Kvízový souboj</h3>
-          <span id="quizCounter" class="text-xs text-slate-400">Otázka 1 / 3</span>
+          <h3 class="text-sm font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🎯</span> Roztřiď pojmy správně
+          </h3>
+          <span id="sortingScore" class="text-xs font-bold text-slate-300">Zbývá: 0</span>
+        </div>
+        <div id="sortingItemsBox" class="flex flex-wrap gap-2 justify-center min-h-[44px] p-2 bg-slate-900/60 rounded-2xl border border-white/10"></div>
+        <div class="grid grid-cols-2 gap-3 pt-1">
+          <button id="sortBinA" onclick="handleSortChoice('A')" class="p-3.5 rounded-2xl bg-indigo-900/70 border-2 border-indigo-400/40 hover:border-indigo-400 text-xs font-bold text-indigo-200 text-center transition flex flex-col items-center justify-center gap-1 active:scale-95 shadow">
+            <span class="text-base">📦</span>
+            <span id="sortCatATitle">Kategorie A</span>
+          </button>
+          <button id="sortBinB" onclick="handleSortChoice('B')" class="p-3.5 rounded-2xl bg-amber-900/70 border-2 border-amber-400/40 hover:border-amber-400 text-xs font-bold text-amber-200 text-center transition flex flex-col items-center justify-center gap-1 active:scale-95 shadow">
+            <span class="text-base">📦</span>
+            <span id="sortCatBTitle">Kategorie B</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Otáčecí kartičky -->
+      <div class="space-y-3">
+        <h3 class="text-xs font-black uppercase tracking-wider text-indigo-200 flex items-center gap-1.5">
+          <span>🃏</span> Otáčecí kartičky (klikni pro vysvětlení)
+        </h3>
+        <div id="flashcardsBox" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+      </div>
+
+      <!-- Kvíz -->
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/15 space-y-4 shadow-xl">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-black text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+            <span>⚔️</span> Kvízový souboj (5 možností)
+          </h3>
+          <span id="quizCounter" class="text-xs font-bold text-slate-300">Otázka 1 / 3</span>
         </div>
         <div id="quizBox" class="space-y-3"></div>
       </div>
+
     </section>
 
     <!-- 2. NAHRÁT LÁTKU -->
     <section id="sec-upload" class="hidden space-y-4">
-      <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+      <div class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/15 space-y-4 shadow-xl">
         <div>
-          <h2 class="text-base font-bold text-white">Vytvořit novou výzvu ze sešitu</h2>
-          <p class="text-xs text-slate-400 mt-0.5">Vyfoť stránku (nebo více stran najednou) a AI z nich vytvoří výukovou hru.</p>
+          <h2 class="text-lg font-black text-amber-300">Nahrát fotky ze sešitu</h2>
+          <p class="text-xs text-slate-300 mt-1">Vyber předmět, vyfoť jednu i víc stran sešitu a AI vygeneruje pestrou herní sadu.</p>
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Předmět:</label>
-          <select id="uploadSubject" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 outline-none focus:border-amber-400">
+          <label class="block text-xs font-bold text-indigo-200 uppercase mb-1">Předmět:</label>
+          <select id="uploadSubject" class="w-full bg-slate-900/90 border border-indigo-400/30 rounded-xl p-3 text-xs text-slate-100 outline-none focus:border-amber-400 font-medium">
             <option value="Dějepis">Dějepis</option>
             <option value="Fyzika">Fyzika</option>
             <option value="Přírodopis">Přírodopis</option>
@@ -116,64 +152,62 @@
         </div>
 
         <div>
-          <label class="block text-xs font-medium text-slate-300 mb-1">Fotky stránky sešitu:</label>
-          <input id="uploadFile" type="file" accept="image/*" multiple class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-700 file:text-slate-200 hover:file:bg-slate-600 cursor-pointer">
+          <label class="block text-xs font-bold text-indigo-200 uppercase mb-1">Fotky stránek:</label>
+          <input id="uploadFile" type="file" accept="image/*" multiple class="w-full text-xs text-slate-300 file:mr-3 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-amber-400 file:text-slate-950 hover:file:bg-amber-300 cursor-pointer bg-slate-900/80 p-2 rounded-2xl border border-white/10">
         </div>
 
-        <button id="startAiBtn" onclick="processUpload()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-lg text-sm transition shadow flex items-center justify-center gap-2">
-          <span id="aiBtnText">Vygenerovat herní lekci 🚀</span>
+        <button id="startAiBtn" onclick="processUpload()" class="w-full py-3.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-slate-950 font-black rounded-2xl text-sm transition shadow-lg flex items-center justify-center gap-2 active:scale-98">
+          <span id="aiBtnText">Vytvořit výukové hry 🚀</span>
           <div id="aiSpinner" class="hidden w-4 h-4 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></div>
         </button>
 
-        <p id="uploadStatus" class="text-xs text-center text-slate-400 hidden"></p>
+        <p id="uploadStatus" class="text-xs text-center text-slate-300 hidden font-medium"></p>
       </div>
     </section>
 
     <!-- 3. PRO MAMKU -->
     <section id="sec-parent" class="hidden space-y-4">
-      <!-- PIN Formulář -->
-      <div id="pinBox" class="bg-slate-800 p-6 rounded-xl border border-slate-700 text-center space-y-3">
-        <span class="text-3xl">🔒</span>
-        <h2 class="text-base font-bold text-white">Přístup pro rodiče</h2>
-        <p class="text-xs text-slate-400">Zadej PIN pro zobrazení výsledků (výchozí: 1234)</p>
+      <div id="pinBox" class="bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/15 text-center space-y-4 shadow-xl">
+        <span class="text-4xl filter drop-shadow">🔒</span>
+        <h2 class="text-lg font-black text-amber-300">Rodičovský přehled</h2>
+        <p class="text-xs text-slate-300">Zadej PIN pro zobrazení statistik a výsledků (výchozí: 1234)</p>
         <div class="flex justify-center gap-2 max-w-xs mx-auto">
-          <input id="pinInput" type="password" maxlength="8" placeholder="••••" class="w-32 text-center tracking-widest bg-slate-950 border border-slate-700 rounded-lg py-2 text-sm text-white focus:border-amber-400 outline-none">
-          <button onclick="unlockParentDashboard()" class="px-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">Odemknout</button>
+          <input id="pinInput" type="password" maxlength="8" placeholder="••••" class="w-32 text-center tracking-widest bg-slate-900/90 border border-indigo-400/30 rounded-xl py-2.5 text-sm text-white focus:border-amber-400 outline-none">
+          <button onclick="unlockParentDashboard()" class="px-5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs transition shadow">Odemknout</button>
         </div>
       </div>
 
-      <!-- Nástěnka po zadání PINu -->
       <div id="parentDashboard" class="hidden space-y-4">
-        <div class="flex justify-between items-center bg-slate-800 p-3.5 rounded-xl border border-slate-700">
-          <span class="text-xs text-slate-300 font-medium">Správa zabezpečení:</span>
-          <button onclick="changeParentPin()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded-lg text-slate-200 transition">🔑 Změnit PIN</button>
+        <div class="flex justify-between items-center bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15">
+          <span class="text-xs text-indigo-200 font-bold">Zabezpečení účtu:</span>
+          <button onclick="changeParentPin()" class="text-xs bg-slate-900/80 hover:bg-slate-900 px-3.5 py-2 rounded-xl text-amber-300 border border-amber-400/30 font-bold transition">🔑 Změnit PIN</button>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-            <p class="text-xs text-slate-400">Celkem pokusů</p>
-            <p id="statTotalRuns" class="text-2xl font-black text-amber-400 mt-1">0</p>
+          <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-center shadow">
+            <p class="text-xs font-bold text-slate-300">Celkem tréninků</p>
+            <p id="statTotalRuns" class="text-3xl font-black text-amber-300 mt-1">0</p>
           </div>
-          <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 text-center">
-            <p class="text-xs text-slate-400">Průměrná úspěšnost</p>
-            <p id="statAvgScore" class="text-2xl font-black text-emerald-400 mt-1">0 %</p>
+          <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 text-center shadow">
+            <p class="text-xs font-bold text-slate-300">Průměrná úspěšnost</p>
+            <p id="statAvgScore" class="text-3xl font-black text-emerald-400 mt-1">0 %</p>
           </div>
         </div>
 
-        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">Historie procvičování</h3>
+        <div class="bg-white/10 backdrop-blur-md p-5 rounded-2xl border border-white/15 space-y-3 shadow">
+          <h3 class="text-xs font-black text-indigo-200 uppercase tracking-wider">Historie pokusů</h3>
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs">
-              <thead class="text-slate-400 border-b border-slate-700">
+              <thead class="text-indigo-200 border-b border-white/15">
                 <tr>
-                  <th class="pb-2">Datum</th>
-                  <th class="pb-2">Předmět</th>
-                  <th class="pb-2">Lekce</th>
-                  <th class="pb-2 text-right">Výsledek</th>
+                  <th class="pb-2.5">Datum</th>
+                  <th class="pb-2.5">Předmět</th>
+                  <th class="pb-2.5">Látka</th>
+                  <th class="pb-2.5 text-right">Úspěšnost</th>
                 </tr>
               </thead>
-              <tbody id="attemptsTableBody" class="divide-y divide-slate-800 text-slate-300">
-                <tr><td colspan="4" class="py-4 text-center text-slate-500">Zatím žádné pokusy</td></tr>
+              <tbody id="attemptsTableBody" class="divide-y divide-white/5 text-slate-200">
+                <tr><td colspan="4" class="py-4 text-center text-slate-400">Zatím žádné pokusy</td></tr>
               </tbody>
             </table>
           </div>
@@ -184,39 +218,82 @@
   </div>
 
   <script>
-    const GEMINI_API_KEY = "AIzaSyC59-_IOR7BYyKzUOAjZgnmSWx9jQT4X5w";
     const SUPABASE_URL = "https://ozwysdwnrpzpnjimhqao.supabase.co";
     const SUPABASE_KEY = "sb_publishable_SkPEAfNlXWQ-UK8kZQgjSg_4JHkT0gA";
 
+    function getApiKey() {
+      let key = localStorage.getItem("SQ_USER_API_KEY");
+      if (!key) {
+        key = prompt("Zadej svůj nový Gemini API klíč (z aistudio.google.com/app/apikey):");
+        if (key && key.trim()) {
+          key = key.trim();
+          localStorage.setItem("SQ_USER_API_KEY", key);
+        }
+      }
+      return key || "";
+    }
+
+    function promptNewApiKey() {
+      const current = localStorage.getItem("SQ_USER_API_KEY") || "";
+      const val = prompt("Vlož nový Gemini API klíč:", current);
+      if (val !== null && val.trim()) {
+        localStorage.setItem("SQ_USER_API_KEY", val.trim());
+        alert("Nový klíč byl bezpečně uložen do tvého prohlížeče!");
+      }
+    }
+
+    // Výchozí pestrá lekce Doba bronzová a železná
     const DEFAULT_LESSON = {
       id: "demo",
       subject: "Dějepis",
       title: "Doba bronzová a železná",
-      summary: "V době bronzové vzniká bronz (slitina mědi a cínu). Nástroje a zbraně se odlévají do kamenných forem. Jako platidlo slouží hřivny a rozvíjí se dálkový obchod. V době železné přichází silnější kov železo (cca 700 př. n. l.), staví se hradiště a v čele společnosti stojí náčelník s vojenskou družinou.",
+      timeline: [
+        { label: "cca 2000 př. n. l.", desc: "Doba bronzová: objev slitiny mědi a cínu, hřivny jako platidlo" },
+        { label: "cca 700 př. n. l.", desc: "Doba železná: příchod železa, kovářství, stavba hradišť, kmenoví náčelníci" }
+      ],
+      summary: "V době bronzové vzniká bronz (slitina mědi a cínu). Nástroje a zbraně se odlévají do kamenných forem. Jako platidlo slouží hřivny a rozvíjí se dálkový obchod. V době železné přichází silnější kov železo (cca 700 př. n. l.), staví se opevněná hradiště na návrších a v čele společnosti stojí náčelník s vojenskou družinou.",
+      sortingGame: {
+        categoryA: "Doba bronzová",
+        categoryB: "Doba železná",
+        items: [
+          { text: "Hřivny jako platidlo", cat: "A" },
+          { text: "Slitina měď + cín", cat: "A" },
+          { text: "Kamenné formy na lití", cat: "A" },
+          { text: "Náčelník a jeho družina", cat: "B" },
+          { text: "Rozvoj kovářství a kolářství", cat: "B" },
+          { text: "Opevněná hradiště na návrších", cat: "B" }
+        ]
+      },
       flashcards: [
-        { term: "Bronz", definition: "Slitina mědi a cínu." },
-        { term: "Hřivna", definition: "Kovový kruh, platidlo v době bronzové." },
-        { term: "Řemesla v době železné", definition: "Rozvoj kovářství a kolářství." },
-        { term: "Sídla", definition: "Opevněná hradiště na vyvýšených místech a neopevněné vesnice." }
+        { term: "Bronz", definition: "Slitina mědi a cínu. Tvrdší než samotná měď." },
+        { term: "Hřivna", definition: "Kovový kruh, předchůdce mincí a platidlo v době bronzové." },
+        { term: "Řemesla doby železné", definition: "Rozvoj specializovaného kovářství a kolářství." },
+        { term: "Sídla a společnost", definition: "Hradiště na návrších a vesnice. Vládne náčelník s ozbrojenou družinou." }
       ],
       quiz: [
         {
-          question: "Z jakých dvou kovů se skládá slitina bronz?",
-          options: ["Měď a cín", "Železo a zinek", "Měď a zlato", "Olovo a stříbro"],
+          question: "Z jakých kovů vzniká slitina bronz?",
+          options: ["Měď a cín", "Železo a uhlík", "Měď a zinek", "Zlato a stříbro", "Olovo a hliník"],
           correctIndex: 0,
-          explanation: "Bronz je slitina mědi a cínu."
+          explanation: "Bronz je slitina mědi a cínu, která byla tvrdší než čisté kovy."
         },
         {
-          question: "Co byla v době bronzové hřivna?",
-          options: ["Kovový kruh používaný jako platidlo", "Zemědělský pluh na orání", "Opevněná vesnice náčelníka", "Forma na tavení mědi"],
+          question: "Co sloužilo v době bronzové jako platidlo a předchůdce mincí?",
+          options: ["Hřivny (kovové kruhy)", "Papírové poukázky", "Železné meče", "Zlaté mince", "Jantarové náhrdelníky"],
           correctIndex: 0,
-          explanation: "Hřivny fungovaly jako předchůdce mincí a platidlo."
+          explanation: "Hřivny byly kovové otevřené kruhy, které se vážily a používaly k platbám."
         },
         {
-          question: "Kdo stál v době železné v čele společnosti?",
-          options: ["Náčelník se svou vojenskou družinou", "Všichni měli stejné postavení", "Pouze samotní kováři", "Kupci z ciziny"],
+          question: "Kolem kterého roku před naším letopočtem začíná na našem území doba železná?",
+          options: ["Cca 700 př. n. l.", "Cca 2000 př. n. l.", "Cca 500 n. l.", "Cca 10 000 př. n. l.", "Cca 100 n. l."],
           correctIndex: 0,
-          explanation: "Vládli vojenští náčelníci obklopení ozbrojenou družinou."
+          explanation: "Doba železná nastupuje zhruba kolem roku 700 př. n. l."
+        },
+        {
+          question: "Kdo stál v době železné na vrcholu společenského žebříčku?",
+          options: ["Náčelník se svou vojenskou družinou", "Všichni lidé měli stejná práva", "Výhradně potulní kupci", "Pouze řemeslníci kováři", "Rada starších žen"],
+          correctIndex: 0,
+          explanation: "Moc soustředil náčelník obklopený vycvičenou a vyzbrojenou družinou bojovníků."
         }
       ]
     };
@@ -226,9 +303,10 @@
     let xp = parseInt(localStorage.getItem("SQ_XP") || "0");
     let lives = 3;
     let attempts = JSON.parse(localStorage.getItem("SQ_ATTEMPTS") || "[]");
+    let sortingQueue = [];
+    let activeSortItem = null;
 
-    // Zvuky
-    function beep(freq, type, dur) {
+    function playBeep(freq, type, dur) {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
         const o = ctx.createOscillator();
@@ -252,25 +330,22 @@
       document.getElementById("playerLevel").innerText = `Level ${lvl} • ${lvl > 3 ? 'Zkušený badatel' : 'Začátečník'}`;
     }
 
-    // PŘEPÍNÁNÍ ZÁLOŽEK
     function switchTab(name) {
-      const tabs = ['game', 'upload', 'parent'];
-      tabs.forEach(t => {
+      ['game', 'upload', 'parent'].forEach(t => {
         const sec = document.getElementById(`sec-${t}`);
         const btn = document.getElementById(`tabBtn-${t}`);
         if (sec) sec.classList.toggle('hidden', t !== name);
         if (btn) {
           if (t === name) {
-            btn.className = "py-2.5 rounded-lg bg-amber-500 text-slate-950 font-bold transition";
+            btn.className = "py-2.5 rounded-xl bg-amber-400 text-slate-950 font-black shadow-lg transition";
           } else {
-            btn.className = "py-2.5 rounded-lg text-slate-400 hover:text-white transition";
+            btn.className = "py-2.5 rounded-xl text-slate-300 hover:text-white font-bold transition";
           }
         }
       });
       if (name === 'parent') renderParentStats();
     }
 
-    // KASKÁDOVÝ VÝBĚR: PŘEDMĚT -> LÁTKA
     function filterLessonsBySubject() {
       const selectedSub = document.getElementById("filterSubjectSelect").value;
       const sel = document.getElementById("lessonSelect");
@@ -307,31 +382,51 @@
       if (found) renderLesson(found);
     }
 
-    // VYKRESLENÍ LEKCE
     function renderLesson(lesson) {
       currentLesson = lesson;
       lives = 3;
       document.getElementById("livesDisplay").innerText = "❤️❤️❤️";
-      document.getElementById("lessonTitle").innerText = lesson.title || "Lekce";
+      document.getElementById("lessonTitle").innerText = lesson.title || "Látka";
       document.getElementById("lessonSummary").innerText = lesson.summary || "";
       document.getElementById("gameSubjectBadge").innerText = lesson.subject || "Předmět";
+
+      // Časová osa
+      const tl = document.getElementById("timelineContainer");
+      if (lesson.timeline && lesson.timeline.length > 0) {
+        tl.innerHTML = "";
+        tl.classList.remove("hidden");
+        lesson.timeline.forEach(item => {
+          const row = document.createElement("div");
+          row.className = "flex items-start gap-3 p-2.5 rounded-2xl bg-slate-900/60 border border-white/10";
+          row.innerHTML = `
+            <span class="text-xs font-black px-2.5 py-1 rounded-xl bg-amber-400 text-slate-950 whitespace-nowrap">${item.label}</span>
+            <span class="text-xs text-slate-200">${item.desc}</span>
+          `;
+          tl.appendChild(row);
+        });
+      } else {
+        tl.classList.add("hidden");
+      }
+
+      // Třídicí minihra
+      initSortingGame(lesson.sortingGame);
 
       // Kartičky
       const box = document.getElementById("flashcardsBox");
       box.innerHTML = "";
       (lesson.flashcards || []).forEach(fc => {
         const card = document.createElement("div");
-        card.className = "card-flip h-28 cursor-pointer select-none";
+        card.className = "card-flip h-32 cursor-pointer select-none";
         card.innerHTML = `
-          <div class="card-inner relative w-full h-full text-center rounded-xl p-3 flex items-center justify-center bg-slate-950 border border-slate-700">
-            <div class="card-front absolute font-bold text-amber-300 px-2 text-sm">${fc.term}</div>
-            <div class="card-back absolute text-xs text-slate-300 px-3 leading-snug">${fc.definition}</div>
+          <div class="card-inner relative w-full h-full text-center rounded-2xl p-4 flex items-center justify-center bg-slate-900/90 border border-white/15 shadow-md">
+            <div class="card-front absolute font-black text-amber-300 px-3 text-sm">${fc.term}</div>
+            <div class="card-back absolute text-xs text-slate-200 px-3 leading-relaxed font-medium">${fc.definition}</div>
           </div>
         `;
         card.onclick = () => {
           card.querySelector(".card-inner").classList.toggle("card-flipped");
-          beep(440, 'sine', 0.05);
-          addXP(1);
+          playBeep(440, 'sine', 0.05);
+          addXP(2);
         };
         box.appendChild(card);
       });
@@ -339,7 +434,56 @@
       renderQuiz(lesson.quiz || []);
     }
 
-    // KVÍZ
+    // TŘÍDICÍ HRA
+    function initSortingGame(gameData) {
+      const container = document.getElementById("sortingGameContainer");
+      if (!gameData || !gameData.items || gameData.items.length === 0) {
+        container.classList.add("hidden");
+        return;
+      }
+      container.classList.remove("hidden");
+
+      document.getElementById("sortCatATitle").innerText = gameData.categoryA;
+      document.getElementById("sortCatBTitle").innerText = gameData.categoryB;
+
+      sortingQueue = [...gameData.items].sort(() => Math.random() - 0.5);
+      showNextSortItem();
+    }
+
+    function showNextSortItem() {
+      const box = document.getElementById("sortingItemsBox");
+      const score = document.getElementById("sortingScore");
+      box.innerHTML = "";
+      score.innerText = `Zbývá: ${sortingQueue.length}`;
+
+      if (sortingQueue.length === 0) {
+        box.innerHTML = `<span class="text-xs font-black text-emerald-300 py-1">Všechny pojmy správně roztříděny! 🎉 (+20 XP)</span>`;
+        addXP(20);
+        playBeep(659, 'triangle', 0.2);
+        return;
+      }
+
+      activeSortItem = sortingQueue[0];
+      const chip = document.createElement("div");
+      chip.className = "px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-400 text-slate-950 font-black text-xs shadow animate-pulse";
+      chip.innerText = activeSortItem.text;
+      box.appendChild(chip);
+    }
+
+    function handleSortChoice(cat) {
+      if (!activeSortItem) return;
+      if (activeSortItem.cat === cat) {
+        playBeep(587, 'triangle', 0.1);
+        addXP(5);
+        sortingQueue.shift();
+        showNextSortItem();
+      } else {
+        playBeep(180, 'sawtooth', 0.2);
+        alert("Vedle! Zkus to do druhé kategorie.");
+      }
+    }
+
+    // KVÍZ (5 možností)
     function renderQuiz(questions) {
       const qBox = document.getElementById("quizBox");
       qBox.innerHTML = "";
@@ -347,18 +491,19 @@
       let correctCount = 0;
 
       if (!questions || questions.length === 0) {
-        qBox.innerHTML = `<p class="text-xs text-slate-400">Pro tuto látku nejsou žádné otázky.</p>`;
+        qBox.innerHTML = `<p class="text-xs text-slate-400">Žádné otázky.</p>`;
         document.getElementById("quizCounter").innerText = "";
         return;
       }
 
       function showQ() {
         if (qIdx >= questions.length) {
+          confetti({ particleCount: 70, spread: 60 });
           const pct = Math.round((correctCount / questions.length) * 100);
           qBox.innerHTML = `
-            <div class="p-5 text-center bg-slate-950 rounded-xl space-y-2 border border-slate-700">
-              <p class="text-lg font-bold text-emerald-400">Skvělá práce! Lekce hotová 🎉</p>
-              <p class="text-xs text-slate-300">Úspěšnost: <b class="text-white">${pct} %</b> (${correctCount} z ${questions.length})</p>
+            <div class="p-6 text-center bg-slate-900/90 rounded-2xl border border-white/10 space-y-2">
+              <p class="text-xl font-black text-emerald-400">Kvíz dokončen! 🏆</p>
+              <p class="text-xs text-slate-300">Tvoje úspěšnost: <b class="text-white text-sm">${pct} %</b> (${correctCount} z ${questions.length})</p>
             </div>
           `;
           saveAttempt(currentLesson.subject, currentLesson.title, pct);
@@ -371,10 +516,10 @@
         const opts = (q.options || []).map((t, i) => ({ t, isRight: i === q.correctIndex })).sort(() => Math.random() - 0.5);
 
         qBox.innerHTML = `
-          <p class="font-bold text-sm text-slate-100">${q.question}</p>
+          <p class="font-bold text-sm text-slate-100 leading-snug">${q.question}</p>
           <div id="optsDiv" class="grid grid-cols-1 gap-2 pt-1"></div>
-          <div id="qExpl" class="hidden text-xs p-3 rounded-lg bg-slate-950 border border-slate-700 text-slate-300 leading-relaxed"></div>
-          <button id="qNextBtn" class="hidden w-full py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg text-xs transition">Další otázka →</button>
+          <div id="qExpl" class="hidden text-xs p-3 rounded-xl bg-slate-900/90 border border-white/10 text-slate-200 leading-relaxed font-medium"></div>
+          <button id="qNextBtn" class="hidden w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-black rounded-xl text-xs transition shadow">Další otázka →</button>
         `;
 
         const optsDiv = document.getElementById("optsDiv");
@@ -384,19 +529,19 @@
         opts.forEach(o => {
           const btn = document.createElement("button");
           btn.type = "button";
-          btn.className = "text-left p-3 rounded-xl border border-slate-700 bg-slate-950 hover:border-slate-500 text-xs text-slate-200 transition font-medium";
+          btn.className = "text-left p-3 rounded-xl border border-white/10 bg-slate-900/80 hover:border-amber-400/60 text-xs text-slate-200 transition font-medium";
           btn.innerText = o.t;
 
           btn.onclick = () => {
             Array.from(optsDiv.children).forEach(b => b.disabled = true);
             if (o.isRight) {
-              btn.classList.add("!border-emerald-500", "!bg-emerald-950/60", "!text-emerald-200");
-              beep(587, 'triangle', 0.1);
+              btn.classList.add("!border-emerald-400", "!bg-emerald-950/70", "!text-emerald-200");
+              playBeep(587, 'triangle', 0.1);
               addXP(10);
               correctCount++;
             } else {
-              btn.classList.add("!border-rose-500", "!bg-rose-950/60", "!text-rose-200");
-              beep(180, 'sawtooth', 0.2);
+              btn.classList.add("!border-rose-400", "!bg-rose-950/70", "!text-rose-200");
+              playBeep(180, 'sawtooth', 0.2);
               lives = Math.max(0, lives - 1);
               document.getElementById("livesDisplay").innerText = "❤️❤️❤️".slice(0, lives * 2) + "🖤".repeat(3 - lives);
             }
@@ -416,7 +561,6 @@
       showQ();
     }
 
-    // ULOŽENÍ VÝSLEDKŮ
     async function saveAttempt(subject, title, percentage) {
       const entry = {
         date: new Date().toLocaleDateString('cs-CZ'),
@@ -427,7 +571,6 @@
       attempts.unshift(entry);
       localStorage.setItem("SQ_ATTEMPTS", JSON.stringify(attempts));
 
-      // Supabase zápis
       try {
         await fetch(`${SUPABASE_URL}/rest/v1/attempts`, {
           method: "POST",
@@ -441,7 +584,6 @@
       } catch(e) {}
     }
 
-    // NAČTENÍ LEKCÍ ZE SUPABASE
     async function loadLessons() {
       try {
         const res = await fetch(`${SUPABASE_URL}/rest/v1/lessons?select=*&order=created_at.desc`, {
@@ -455,6 +597,8 @@
               subject: d.subject,
               title: d.title,
               summary: d.summary,
+              timeline: d.payload?.timeline || [],
+              sortingGame: d.payload?.sortingGame || null,
               flashcards: d.payload?.flashcards || [],
               quiz: d.payload?.quiz || []
             }))];
@@ -464,7 +608,6 @@
       } catch(e) {}
     }
 
-    // PŘÍPRAVA FOTKY
     function readFileAsBase64(file) {
       return new Promise((res, rej) => {
         const r = new FileReader();
@@ -474,8 +617,11 @@
       });
     }
 
-    // NAHRÁVÁNÍ A AI GENEROVÁNÍ
+    // NAHRÁVÁNÍ FOTEK DO GEMINI
     async function processUpload() {
+      const apiKey = getApiKey();
+      if (!apiKey) return;
+
       const fileInput = document.getElementById("uploadFile");
       const subject = document.getElementById("uploadSubject").value;
       const status = document.getElementById("uploadStatus");
@@ -483,72 +629,93 @@
       const btnText = document.getElementById("aiBtnText");
 
       if (!fileInput.files || fileInput.files.length === 0) {
-        alert("Nejprve vyber nebo vyfoť alespoň jednu stránku sešitu!");
+        alert("Vyber alespoň jednu fotku sešitu!");
         return;
       }
 
       spinner.classList.remove("hidden");
       btnText.innerText = "Čtu fotky...";
       status.classList.remove("hidden");
-      status.innerText = "Odesílám do AI...";
+      status.innerText = "Analyzuji a tvořím cvičení...";
 
       try {
         const files = Array.from(fileInput.files);
         const imageParts = [];
         for (const file of files) {
           const b64 = await readFileAsBase64(file);
-          imageParts.push({
-            inline_data: { mime_type: "image/jpeg", data: b64 }
-          });
+          imageParts.push({ inline_data: { mime_type: "image/jpeg", data: b64 } });
         }
 
-        const prompt = `Jsi učitel pro žáka ZŠ (12 let). Z fotek sešitu z předmětu ${subject} vytvoř výukový balíček v češtině. 
-Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
+        const prompt = `Jsi skvělý učitel a herní designér pro 12letého žáka. Z fotek sešitu z předmětu ${subject} vytvoř kompletní výukový balíček v češtině.
+Vrať POUZE validní JSON bez jakéhokoliv dalšího textu v této struktuře:
 {
   "title": "Název tématu",
-  "summary": "Stručný a srozumitelný souhrn látky (2-3 odstavce)",
+  "timeline": [
+    { "label": "Rok / Období / Fáze", "desc": "Co se stalo" }
+  ],
+  "summary": "Poutavý a srozumitelný souhrn látky (2-3 odstavce)",
+  "sortingGame": {
+    "categoryA": "Název kategorie 1",
+    "categoryB": "Název kategorie 2",
+    "items": [
+      { "text": "Pojem 1", "cat": "A" },
+      { "text": "Pojem 2", "cat": "B" },
+      { "text": "Pojem 3", "cat": "A" },
+      { "text": "Pojem 4", "cat": "B" }
+    ]
+  },
   "flashcards": [
-    { "term": "Pojem", "definition": "Vysvětlení" }
+    { "term": "Klíčový pojem", "definition": "Jasné vysvětlení" }
   ],
   "quiz": [
     {
       "question": "Otázka?",
-      "options": ["Správná možnost", "Špatná 1", "Špatná 2", "Špatná 3"],
+      "options": ["Správná možnost", "Špatná 1", "Špatná 2", "Špatná 3", "Špatná 4"],
       "correctIndex": 0,
-      "explanation": "Stručné vysvětlení"
+      "explanation": "Proč je odpověď správná"
     }
   ]
 }`;
 
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${GEMINI_API_KEY}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{
-              parts: [{ text: prompt }, ...imageParts]
-            }],
-            generationConfig: { responseMimeType: "application/json" }
-          })
-        });
+        // Bezpečné volání s fallbackem
+        const models = ["gemini-2.5-flash", "gemini-3-flash-preview", "gemini-2.0-flash"];
+        let generated = null;
+        let lastErr = "";
 
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error?.message || `Chyba API ${res.status}`);
+        for (const m of models) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }, ...imageParts] }],
+                generationConfig: { responseMimeType: "application/json" }
+              })
+            });
+            if (res.ok) {
+              const j = await res.json();
+              generated = JSON.parse(j.candidates[0].content.parts[0].text);
+              break;
+            } else {
+              const errObj = await res.json().catch(() => ({}));
+              lastErr = errObj.error?.message || `Chyba ${res.status}`;
+            }
+          } catch(e) { lastErr = e.message; }
         }
 
-        const jsonRes = await res.json();
-        const generated = JSON.parse(jsonRes.candidates[0].content.parts[0].text);
+        if (!generated) throw new Error(lastErr || "Nepodařilo se vygenerovat data.");
 
         const newLesson = {
           id: "local_" + Date.now(),
           subject: subject,
           title: generated.title,
+          timeline: generated.timeline || [],
           summary: generated.summary,
-          flashcards: generated.flashcards,
-          quiz: generated.quiz
+          sortingGame: generated.sortingGame || null,
+          flashcards: generated.flashcards || [],
+          quiz: generated.quiz || []
         };
 
-        // Zápis do Supabase
         try {
           await fetch(`${SUPABASE_URL}/rest/v1/lessons`, {
             method: "POST",
@@ -561,7 +728,12 @@ Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
               subject: subject,
               title: newLesson.title,
               summary: newLesson.summary,
-              payload: { flashcards: newLesson.flashcards, quiz: newLesson.quiz }
+              payload: {
+                timeline: newLesson.timeline,
+                sortingGame: newLesson.sortingGame,
+                flashcards: newLesson.flashcards,
+                quiz: newLesson.quiz
+              }
             })
           });
         } catch(e) {}
@@ -572,21 +744,19 @@ Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
         renderLesson(newLesson);
 
         fileInput.value = "";
-        alert("Výuková hra byla úspěšně vytvořena!");
+        alert("Výuková sada byla úspěšně vygenerována!");
         switchTab('game');
-      } catch (err) {
-        alert("Nastala chyba: " + err.message);
-        status.innerText = "Chyba při zpracování.";
+      } catch(err) {
+        alert("Chyba při zpracování: " + err.message);
+        status.innerText = "Chyba generování.";
       } finally {
         spinner.classList.add("hidden");
-        btnText.innerText = "Vygenerovat herní lekci 🚀";
+        btnText.innerText = "Vytvořit výukové hry 🚀";
       }
     }
 
     // RODIČOVSKÝ PŘÍSTUP
-    function getPin() {
-      return localStorage.getItem("SQ_PIN") || "1234";
-    }
+    function getPin() { return localStorage.getItem("SQ_PIN") || "1234"; }
 
     function unlockParentDashboard() {
       const entered = document.getElementById("pinInput").value.trim();
@@ -609,7 +779,7 @@ Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
       const newPin = prompt("Zadej nový PIN (minimálně 4 znaky):");
       if (newPin && newPin.trim().length >= 4) {
         localStorage.setItem("SQ_PIN", newPin.trim());
-        alert("PIN byl v pořádku změněn!");
+        alert("PIN byl úspěšně změněn!");
       } else if (newPin !== null) {
         alert("PIN musí mít alespoň 4 znaky!");
       }
@@ -620,7 +790,7 @@ Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
       tbody.innerHTML = "";
 
       if (attempts.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-500">Zatím žádné pokusy</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Zatím žádné pokusy</td></tr>`;
         document.getElementById("statTotalRuns").innerText = "0";
         document.getElementById("statAvgScore").innerText = "0 %";
         return;
@@ -632,12 +802,12 @@ Vrať POUZE čistý JSON v tomto formátu (žádný markdown okolo):
 
       attempts.forEach(a => {
         const tr = document.createElement("tr");
-        tr.className = "hover:bg-slate-800/50";
+        tr.className = "hover:bg-white/5";
         tr.innerHTML = `
-          <td class="py-2.5 text-slate-400">${a.date}</td>
-          <td class="py-2.5 font-semibold text-slate-200">${a.subject}</td>
-          <td class="py-2.5 text-slate-300">${a.title}</td>
-          <td class="py-2.5 text-right font-bold ${a.percentage >= 70 ? 'text-emerald-400' : 'text-amber-400'}">${a.percentage} %</td>
+          <td class="py-2.5 text-slate-300">${a.date}</td>
+          <td class="py-2.5 font-bold text-amber-300">${a.subject}</td>
+          <td class="py-2.5 text-slate-200">${a.title}</td>
+          <td class="py-2.5 text-right font-black ${a.percentage >= 70 ? 'text-emerald-400' : 'text-amber-300'}">${a.percentage} %</td>
         `;
         tbody.appendChild(tr);
       });
